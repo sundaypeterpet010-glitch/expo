@@ -123,26 +123,28 @@ export function NativeTabsNavigator({
   const provenanceRef = useRef(0);
 
   const onTabChange = useCallback(
-    ({ selectedKey, provenance }: OnTabChangeEventPayload) => {
+    ({ selectedKey, provenance, isNativeAction }: OnTabChangeEventPayload) => {
       // We should always send the last provenance we got from native side
       provenanceRef.current = provenance;
 
-      const descriptor = descriptors[selectedKey];
-      const route = descriptor.route;
-      navigation.emit({
-        type: 'tabPress',
-        target: selectedKey,
-        data: {
-          __internalTabsType: 'native',
-        },
-      });
-      navigation.dispatch({
-        type: 'JUMP_TO',
-        target: state.key,
-        payload: {
-          name: route.name,
-        },
-      });
+      if (isNativeAction) {
+        const descriptor = descriptors[selectedKey];
+        const route = descriptor.route;
+        navigation.emit({
+          type: 'tabPress',
+          target: selectedKey,
+          data: {
+            __internalTabsType: 'native',
+          },
+        });
+        navigation.dispatch({
+          type: 'JUMP_TO',
+          target: state.key,
+          payload: {
+            name: route.name,
+          },
+        });
+      }
     },
     [descriptors, navigation, state.key]
   );
